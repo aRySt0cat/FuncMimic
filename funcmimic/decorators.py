@@ -18,7 +18,20 @@ function_dict = {
     },
 }
 
-def mimic(return_type, prompt=DEFAULT_PROMPT):
+def type_parser(type):
+    if type in [int, float]:
+        return {"type": "number"}
+    if type == str:
+        return {"type": "string"}
+    if type == bool:
+        return {"type": "boolean"}
+    if type == list:
+        return {"type": "array", "items": {"type": "object"}}
+    if type.__name__ == list:
+        return {"type": "array", "items": type_parser(type.__args__[0])}
+
+
+def mimic(prompt=DEFAULT_PROMPT):
     def _mimic(func):
         def wrapper(*args, **kwargs):
             docstring = func.__doc__
@@ -26,8 +39,11 @@ def mimic(return_type, prompt=DEFAULT_PROMPT):
             arg_names = func.__code__.co_varnames
             args = dict(zip(arg_names, list(args) + list(func.__defaults__)))
             args.update(kwargs)
-            # return_type = func.__annotations__.get("return", None)
-            function_dict["parameters"]["properties"]["result"]["type"] = return_type
+            return_type = func.__annotations__.get("return", None)
+            return_type = type_parser(return_type)
+            return_type["description"] = "the result"
+            print(return_type)
+            function_dict["parameters"]["properties"]["result"] = return_type
             content = prompt.format(docstring=docstring, args=args)
             response = openai.ChatCompletion.create(
                 model="gpt-3.5-turbo",

@@ -1,7 +1,7 @@
 from funcmimic import mimic
 from pytest import fixture
 
-@mimic(return_type="string")
+@mimic()
 def n_hello(n=1) -> str:
     """ n 回 hello を繰り返す
 
