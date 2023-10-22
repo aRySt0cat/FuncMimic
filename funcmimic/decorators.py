@@ -37,7 +37,8 @@ def mimic(prompt=DEFAULT_PROMPT):
             docstring = func.__doc__
 
             arg_names = func.__code__.co_varnames
-            args = dict(zip(arg_names, list(args) + list(func.__defaults__)))
+            defaults = () if func.__defaults__ is None else func.__defaults__
+            args = dict(zip(arg_names, list(args) + list(defaults)))
             args.update(kwargs)
             return_type = func.__annotations__.get("return", None)
             return_type = type_parser(return_type)
