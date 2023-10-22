@@ -42,7 +42,6 @@ def mimic(prompt=DEFAULT_PROMPT):
             return_type = func.__annotations__.get("return", None)
             return_type = type_parser(return_type)
             return_type["description"] = "the result"
-            print(return_type)
             function_dict["parameters"]["properties"]["result"] = return_type
             content = prompt.format(docstring=docstring, args=args)
             response = openai.ChatCompletion.create(
